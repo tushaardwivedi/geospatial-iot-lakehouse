@@ -1,0 +1,26 @@
+{
+    "name": "Data Engineering Workspace",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11-bookworm",
+    "features": {
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": false
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.linting.enabled": true
+            },
+            "extensions": [
+                "ms-python.python",
+                "ms-azuretools.vscode-docker",
+                "github.copilot",
+                "ms-python.vscode-pylance"
+            ]
+        }
+    },
+    "forwardPorts": [9092, 8080], 
+    "postCreateCommand": "pip install --upgrade pip && pip install black flake8"
+}
