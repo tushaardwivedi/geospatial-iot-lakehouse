@@ -1,10 +1,11 @@
 import os
 import sys
+import time  # For managing retry intervals
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
-# FIX: Using the correct, modern and updated SDK library mapping
 from google import genai
 from google.genai import types
+from google.genai import errors  # FIX: Import API errors framework
 
 SILVER_DIR = '/workspaces/geospatial-iot-lakehouse/data/silver/telemetry_parquet/'
 
@@ -40,21 +41,18 @@ def get_critical_anomalies():
         spark.stop()
 
 def dispatch_ai_recovery(anomaly_list):
-    """Sends minified data to Gemini 3.5 Flash using the modern unified SDK."""
+    """Sends minified data to Gemini 3.5 Flash with built-in resilient retry logic."""
     if not anomaly_list:
         print("No critical fleet anomalies detected by Spark. Zero tokens used.")
         return
 
-    # Check for the correct environment variable
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         print("CRITICAL SECURITY ERROR: GEMINI_API_KEY environment variable not detected.")
         sys.exit(1)
 
-    # Initialize the modern unified client wrapper (automatically captures GEMINI_API_KEY)
     client = genai.Client()
 
-    # Define strict behavior constraints inside the updated GenerateContentConfig layout
     config = types.GenerateContentConfig(
         system_instruction=(
             "You are an automated logistics dispatch agent. Analyze the provided fleet anomalies. "
@@ -65,18 +63,35 @@ def dispatch_ai_recovery(anomaly_list):
 
     prompt = f"Anomalies: {anomaly_list}"
     
+    # ADVANCED RESILIENCE: Retry Configuration Parameters
+    max_retries = 3
+    initial_delay = 4  # Seconds to wait on first failure
+    
     print(f"Sending {len(anomaly_list)} isolated cases to Gemini Engine...")
     
-    # Execute call utilizing Gemini 3.5 Flash
-    response = client.models.generate_content(
-        model='gemini-3.5-flash',
-        contents=prompt,
-        config=config
-    )
-    
-    print("\n--- GOLD LAYER AI DISPATCH PLAN (RAW JSON) ---")
-    print(response.text.strip())
-    print("----------------------------------------------")
+    for attempt in range(max_retries):
+        try:
+            response = client.models.generate_content(
+                model='gemini-3.5-flash',
+                contents=prompt,
+                config=config
+            )
+            
+            # If successful, print results and exit the retry loop entirely
+            print("\n--- GOLD LAYER AI DISPATCH PLAN (RAW JSON) ---")
+            print(response.text.strip())
+            print("----------------------------------------------")
+            return
+            
+        except errors.APIError as e:
+            # Check if it's a temporary high demand (503) or rate limit error
+            if attempt < max_retries - 1:
+                print(f"⚠️ [API WARNING] Google servers busy (Status {e.code}). Retrying in {initial_delay}s... (Attempt {attempt + 1}/{max_retries})")
+                time.sleep(initial_delay)
+                initial_delay *= 2  # Exponential backoff: 4s -> 8s -> 16s
+            else:
+                print("❌ [CRITICAL ERROR] Gemini servers down after maximum retry attempts.")
+                raise e # Re-raise the error to let the orchestrator fail-fast safely
 
 if __name__ == "__main__":
     print("Starting Gold Layer Analytics & AI Dispatcher...")
