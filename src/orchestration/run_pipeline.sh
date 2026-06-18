@@ -1,6 +1,13 @@
 #!/bin/bash
 
 # ==============================================================================
+# ADVANCED SHELL DEBUGGING FLAGS
+# ==============================================================================
+set -e          # Exit immediately if any command exits with a non-zero status.
+set -o pipefail # Captures failures hidden inside text pipes (|).
+# set -x        # UNCOMMENT THIS LINE ONLY FOR DEEP TRACING (Prints every execution step live)
+
+# ==============================================================================
 # Enterprise Lakehouse Orchestration Control Loop
 # Core Focus: Lifecycle Automation & Subprocess Tracking
 # ==============================================================================

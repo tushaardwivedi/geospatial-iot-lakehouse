@@ -23,4 +23,14 @@
     },
     "forwardPorts": [9092, 8080], 
     "postCreateCommand": "pip install --upgrade pip && pip install black flake8"
+
+    
+    {
+        "name": "Geospatial IoT Lakehouse Container",
+        "features": {
+            "ghcr.io/devcontainers/features/azure-cli:1": {} // Automatically installs az CLI on build!
+        },
+        "postCreateCommand": "pip install -r requirements.txt" // Automatically installs python stack!
+    }
 }
+

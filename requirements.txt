@@ -1,0 +1,5 @@
+kafka-python-ng
+pyspark
+azure-storage-file-datalake
+azure-identity
+google-genai
