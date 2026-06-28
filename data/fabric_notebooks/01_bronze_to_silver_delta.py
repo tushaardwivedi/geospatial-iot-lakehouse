@@ -15,6 +15,7 @@ print("🔒 API Credentials injected safely into the Cloud Spark Environment.")
 # %pip install google-genai
 
 
+
 #Cell 3: Bronze to Silver Delta Compaction Engine
 from pyspark.sql.functions import col, to_timestamp
 
