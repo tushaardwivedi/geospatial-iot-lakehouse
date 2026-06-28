@@ -1,8 +1,21 @@
 # ==============================================================================
-# Microsoft Fabric Synapse Notebook: Bronze to Silver Delta Compaction
+# Microsoft Fabric Synapse Notebook: Bronze to Silver to Gold AI Pipeline
 # Core Focus: Schema Enforcement, Columnar Optimization, & ACID Transactions
 # ==============================================================================
 
+# Cell 1: Secure Environment Handshake
+import os
+
+# Inject your key directly into the Spark driver's active operating system memory
+os.environ["GEMINI_API_KEY"] = "PLACEHOLDER_ENTERPRISE_KEY_DO_NOT_COMMIT"
+print("🔒 API Credentials injected safely into the Cloud Spark Environment.")
+
+# Cell 2: Inline Cluster Package Management
+# The command is not a standard IPython magic command. It is designed for use within Fabric notebooks only.
+# %pip install google-genai
+
+
+#Cell 3: Bronze to Silver Delta Compaction Engine
 from pyspark.sql.functions import col, to_timestamp
 
 # 1. Define direct local OneLake relative paths
@@ -38,29 +51,9 @@ except Exception as e:
     print(f"❌ CRITICAL PIPELINE FAILURE: {e}")
 
 
-# In[6]:
 
 
-# Cell 2: Inline Cluster Package Management
-# The command is not a standard IPython magic command. It is designed for use within Fabric notebooks only.
-# %pip install google-genai
-
-
-# In[7]:
-
-
-# Cell 1: Secure Environment Handshake
-import os
-
-# Inject your key directly into the Spark driver's active operating system memory
-os.environ["GEMINI_API_KEY"] = "PLACEHOLDER_ENTERPRISE_KEY_DO_NOT_COMMIT"
-print("🔒 API Credentials injected safely into the Cloud Spark Environment.")
-
-
-# In[13]:
-
-
-# Cell 3: Gold Layer Analytical Filtering & AI Dispatch Orchestration (Resilient Cloud Passing)
+# Cell 4: Gold Layer Analytical Filtering & AI Dispatch Orchestration (Resilient Cloud Passing)
 from pyspark.sql.functions import col
 from google import genai
 from google.genai import types
